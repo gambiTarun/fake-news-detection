@@ -272,5 +272,3 @@ This implies that a fake news article is much better categorized by the vocabula
 1. _Pennington, Jeffrey. Single-Link and Complete-Link Clustering, nlp.stanford.edu/projects/glove/._
 
 1. "_TensorFlow." TensorFlow, www.tensorflow.org/._
-
-17
