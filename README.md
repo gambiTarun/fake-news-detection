@@ -1,5 +1,5 @@
 # fake-news-detection
-Various machine learning algorithms are explored to train a binary classifier fake new articles.
+Various machine learning algorithms are explored to train a classifier for fake new articles.
 
 ## **INTRODUCTION**
 
