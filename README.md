@@ -237,7 +237,7 @@ This model was trained using the news articles consisting of sequence of integer
 
 <img width="187" alt="Picture1" src="https://user-images.githubusercontent.com/22619455/191872744-a0830c56-f842-4bdc-be86-25547013175e.png">
 
-1. **Conclusion**
+## **Conclusion**
 
 The aim of this project was to test different data representation methods and train various models using this data. We collected our real news articles from sources like The Gaurdian and the fake news dataset was aquired from Kaggle. Then two type of data representation techniques were used namely, TF-IDF Vectorization and Word Embeddings. The resulting transformed data was trained on the models mentioned in Section 4, and the following results were extrapolated from this experiment.
 
@@ -251,7 +251,7 @@ The LSTM Network model took the most time to train and was very computationally 
 
 This implies that a fake news article is much better categorized by the vocabulary used and its frequency rather than the semantic analysis of the article using the sequence of words.
 
-**References**
+## **References**
 
 1. _Bajaj, "The Pope Has a New Baby!" Fake News Detection Using Deep Learning, Stanford University CS 224N - Winter 2017_
 
