@@ -9,7 +9,7 @@ So, from a Natural Language Processing perspective, this challenge posses a poss
 
 ## **Data Collection**
 
-Fake News for the Classifier was acquired from an open Kaggle dataset, a collection of 12000 articles that span various genres [1].
+Fake News for the Classifier was acquired from an open Kaggle dataset, a collection of 12000 articles that span various genres [2].
 
 The Real News was procured from 'The Gaurdian' using one of their APIs collect Real World news from their website. The Real News must belong to similar subjects as the Fake News in order to get consistent results from the data. Hence, with this aim in mind I decided to create a WordCloud of the Fake News articles from the Kaggle dataset.
 
