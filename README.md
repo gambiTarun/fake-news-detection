@@ -1,25 +1,25 @@
 # fake-news-detection
 Various algorithms are explored to train a binary classifier for detecting a fake new article.
 
-1. **INTRODUCTION**
+## **INTRODUCTION**
 
 The challenge of identifying real news from fake news can be tackled by different approaches. Getting the information about the article, like the source of the news, date of publishing, whether it was reported online or in print etc, is one of the approaches where these features will help classify the news as real or fake. But getting source information on an article is not always possible.
 
 So, from a Natural Language Processing perspective, this challenge posses a possibility of an underlying pattern that can be identified by training a binary classifier. This implies, we just need to focus on the body of the article and extract relevant features that might form a pattern which can be recognised by our classifier.
 
-1. **Data Collection**
+## **Data Collection**
 
 Fake News for the Classifier was acquired from an open Kaggle dataset, a collection of 12000 articles that span various genres [1].
 
 The Real News was procured from 'The Gaurdian' using one of their APIs collect Real World news from their website. The Real News must belong to similar subjects as the Fake News in order to get consistent results from the data. Hence, with this aim in mind I decided to create a WordCloud of the Fake News articles from the Kaggle dataset.
 
-![Picture 1](RackMultipart20220915-1-48neab_html_ac04797fa78e79aa.gif)
+![Picture1](https://user-images.githubusercontent.com/22619455/191871549-daf3d8b3-a225-480e-95a3-ee0ab5550908.png)
 
 _Figure 1 Fake News WordCloud_
 
 From the above WordCloud, it was clear that the Real News is to be collected from what subjects. So, the news articles published from January, 2016 to September, 2018 belonging to the genres of Politics, Business, World-News, UK-News, Government and US-News were scrapped using the GaurdianAPI. In total I was ables to collect 68000 articles of real news.
 
-![Picture 3](RackMultipart20220915-1-48neab_html_789467e46e02a245.gif)
+![Picture1](https://user-images.githubusercontent.com/22619455/191871627-daf1e39b-9625-49ad-a5ab-ea4b7e80db3d.png)
 
 _Figure 2 Real News WordCloud_
 
@@ -29,7 +29,7 @@ The dataset of news articles is first filtered by removing any article's body wi
 
 After filtering, the fake news and the real news articles are clubbed together into a dataset. This dataset is shuffled and divided into 'train-dataset' and 'test\_dataset' in the ratio 80%:20%.
 
-1. **DATA REPRESENTATION**
+## **DATA REPRESENTATION**
 
   1. **TF-IDF Vectorization**
 
@@ -39,7 +39,7 @@ The vectorization is done using **TfidfVectorizer** function of sklearn library.
 
 This creates a vast matrix that with the shape of [number of documents, number of tokens]. The number of documents in the training dataset are in the order of 45000 and the tokens are of the order 73000. This matrix is given output by the TfidfVectorizer function as a **sparse matrix** as most of the elements of any tf-idf vector are zeros. The sparse matrix are convenient to handle and can be used for computation without occupying a lot of computer memory.
 
-![Picture 1](RackMultipart20220915-1-48neab_html_ab0e2bf6cb4cfca6.gif)
+![Picture1](https://user-images.githubusercontent.com/22619455/191871974-201cdffd-127d-4b1a-a6e2-b85f5be0b612.jpg)
 
 _Figure 3 tf-idf Vectorization of Article #0_
 
@@ -51,19 +51,19 @@ Contrary to **Principle Component Analysis (PCA),** this estimator does not cent
 
 I used TrucatedSVD function from the sklearn library. The TruncatedSVD is used to calculate the SVD rather than simple SVD because the truncated version just computes the SVD corresponding to the largest 'n' singular values, and the rest of the matrix is discarded. This can be much quicker and economical than the traditional SVD when n\<\<number of total features, which is generally in the case of tfidf vectors. The input arguments are the algorithm which can be 'arpack' or 'randomized', n\_iter corresponds to the number of iterations for the randomized svd solver and n\_components is the number of components to be selected from the diagonal singular value matrix after computation of SVD. The diagonal positive definite matrix has values along the diagonal in descending order and the top n\_components of this matrix are used to reconstruct our reduced featureset. Hence, n\_components will be the number of features which our whole featureset is reduced to. The reduced training dataset is now created by **fitting** and **tranforming** the training dataset's tfidf vector through this TruncatedSVD object.
 
-![Picture 5](RackMultipart20220915-1-48neab_html_435674e03c0187c5.gif)
+![Picture1](https://user-images.githubusercontent.com/22619455/191872028-b2363f7c-5308-4a67-bd43-cbba31b1023b.jpg)
 
 _Figure 4 LSA reduced Vectorization of Article #0_
 
 We used n\_components = 1000 which means the tokens have been reduced from 73000 to 1000 while preserving the structure of the important class defining tokens. We can also represent these selected tokens as the percentage of variance they contribute to the total variance of the dataset.
 
-![](RackMultipart20220915-1-48neab_html_1c83590712dbd3dc.jpg)
+![Picture1](https://user-images.githubusercontent.com/22619455/191872084-94de17fd-9a01-43fd-af45-0ff51344dd9d.jpg)
 
 _Figure 5 Feature Variance Contribution in %_
 
 This plot of variance ratio shows the declining contribution of the tokens to the total variance of our dataset. The first 50 tokens of our reduced featureset contribute maximum to the class defining properties and therefore will be the most important in classifying our data.
 
-![](RackMultipart20220915-1-48neab_html_21e2ab22ca0ffb86.jpg)
+![Picture1](https://user-images.githubusercontent.com/22619455/191872126-13f6fc20-be8e-4698-85ab-d6859eca5a82.jpg)
 
 _Figure 6 Cummulative Feature Variance Contribution in %_
 
@@ -71,7 +71,7 @@ We see from the above plot that our total reduced featureset of 1000 tokens cont
 
 We can also use the first two tokens (two most important in class defining) to visually see how they form any pattern in identifying a fake news from a non-fake news article. Because our tf-idf vector is not centered, the first feature after LSA reduction just contains information on the frequency of the words in the documents. Therefore, to really see any difference in features of the two types of articles, we will use second and third most variant feature's plot to see any distinct pattern.
 
-![Picture 13](RackMultipart20220915-1-48neab_html_8387cf85e396dc77.gif)
+![Picture1](https://user-images.githubusercontent.com/22619455/191872159-ec835eea-b85c-4d26-a5ed-99c765eacd5b.jpg)
 
 _Figure 7 Visual Representation of train Dataset using top 2 features_
 
@@ -79,7 +79,7 @@ Here, the green dots represent a non-fake news datapoint, whereas a red dot repr
 
 The test dataset comprising of around 11000 news articles is now created by **tranforming** the test news articles through the TfidfVectorization object and then the TruncatedSVD object creating the same featureset for our test news articles.
 
-  1. **Word Embeddings**
+  2. **Word Embeddings**
 
 Word  **embedding**  is the collective name for a set of language modeling and feature learning techniques in natural language processing (NLP) where words or phrases from the vocabulary are mapped to vectors of real numbers.
 
@@ -92,13 +92,13 @@ Generation of vectors of real numbers corresponding to each English word require
 
 These vector representation of words possesses information like:
 
-1. **Nearest neighbors**
+2.1. **Nearest neighbors**
 
 - The **Euclidean distance** (or cosine similarity) between two word vectors provides an effective method for measuring the linguistic or semantic similarity of the corresponding words. Sometimes, the nearest neighbors according to this metric reveal rare but relevant words that lie outside an average human's vocabulary. For example, here are the closest words to the target word _frog_:
 
 - _frog :_ frogs, toad, litoria, leptodactylidae, rana etc.
 
-1. **Linear substructures**
+2.2. **Linear substructures**
 
 - The **similarity metrics** used for nearest neighbor evaluations produce a single scalar that quantifies the relatedness of two words. This simplicity can be problematic since two given words almost always exhibit more intricate relationships than can be captured by a single number.
 
@@ -108,7 +108,7 @@ The order of the phrases in the article is maintained and hence this type of rep
 
 The vocabulary dictionary of unique words formed from the first 1000 words of each article are mapped to their corresponding vectors from the GloVe embeddings. The words in this dictionary but not in the GloVe embeddings are mapped to a vector of 0s. Hence, an **embedding matrix** of size 187,000x100 is formed.
 
-1. **Models**
+## **Models**
 
 Several different Classifying Models were implemented to accurately predict if a News article is fake or non-fake. The training dataset and test dataset from above data preprocessing is used to train and check the reliability of our model. The Accuracy and F1 Scores on the test set are reported for each model. Here, the F1 Score is a more reliable testing parameter as the ratio of the fake to non-fake news is not 0.5, rather it was estimated on the basis of empirical evidence to replicate the state of published news in the real world.
 
@@ -127,11 +127,9 @@ The model was trained using the tfidf vector after dimensionality reduction. The
 
 The training and then prediction for the test set was performed 10 times using the same total dataset. For every iteration the dataset was split randomly into Training and Test set then the tf-idf and dimensionality reduction was carried out on the training and the test set. The model performance in terms of the Accuracy, Precision, Recall and F1 Score was averaged across all ten iterations and the final results are as follows.
 
-![](RackMultipart20220915-1-48neab_html_95c94a8bfe24f791.png)
+<img width="228" alt="Picture1" src="https://user-images.githubusercontent.com/22619455/191872417-03b212a6-6575-46bf-98d1-a4242a99b1fd.png">
 
-![Shape1](RackMultipart20220915-1-48neab_html_80d06e8079590ff0.gif) ![](RackMultipart20220915-1-48neab_html_ee28a4ef9304c48e.png)
-
-1. **Support Vector Machine**
+2. **Support Vector Machine**
 
 The SVM training algorithm builds a model that assigns an datapoint to one class or the other. The SVM model is the representation of sample points in n dimensional space, mapped so that examples of different class are divided by a clear boundary or gap that is as wide as possible. The test or unseen examples are then mapped to the same space belonging to one category or the other based on which side of the boundary they fall. This boundary solve both linear or non linear classification problems based on the kernel methods used for training. A Support Vector Classifier is created using the SVC function of sklearn library. The parameters of the function used :
 
@@ -145,11 +143,9 @@ Then the model was tested for accuracy on the test dataset and a Confusion Matri
 
 The training and then prediction for the test set was performed 10 times using the same total dataset. For every iteration the dataset was split randomly into Training and Test set then the tf-idf and dimensionality reduction was carried out on the training and the test set. The model performance in terms of the Accuracy, Precision, Recall and F1 Score was averaged across all ten iterations and the final results are as follows.
 
-![](RackMultipart20220915-1-48neab_html_a0a2047f81574300.png)
+<img width="202" alt="Picture1" src="https://user-images.githubusercontent.com/22619455/191872487-2d305186-44a0-4118-ad85-0782de5c5dc1.png">
 
-![Shape2](RackMultipart20220915-1-48neab_html_80d06e8079590ff0.gif) ![](RackMultipart20220915-1-48neab_html_1bb1e15f83996acd.png)
-
-1. **Random Forest**
+3. **Random Forest**
 
 The random forest algorithm creats a forest with a number of Decision Trees. It is a type of Ensemble machine learning algorithm, which use a divide-and-conquer approach. The main principle behind ensemble algorithms is **boosting** , that is a group of weak learners (single estimator or a decision tree) can work together to form a strong learner (group of estimators or a forest) to classify the data. The random decision forests can correct for the decision trees' habit of overfitting to the training dataset. Hence, random forest algorithm comprises of **bagging** (Bootstrap aggregating), which is the approach to reduce overfitting by combining the classifications of randomly generated training sets, together with the random selection of features to construct a collection of decision forests.
 
@@ -160,7 +156,7 @@ The Random Forest Classifier is created using the RandomForestClassifier functio
 
 The model was trained using the tfidf vector after dimensionality reduction. The model can also show the feature importance of all the tokens based on the gini importance criterion.
 
-![Shape3](RackMultipart20220915-1-48neab_html_d8c2a79473b0f2a3.gif)
+<img width="340" alt="Picture1" src="https://user-images.githubusercontent.com/22619455/191872521-05e0b7c3-0c25-453f-b4ef-8f16acc9683a.png">
 
 _Figure 8 Feature Importance_
 
@@ -172,15 +168,13 @@ Then the model was tested for accuracy on the test dataset and a Confusion Matri
 
 The training and then prediction for the test set was performed 10 times using the same total dataset. For every iteration the dataset was split randomly into Training and Test set then the tf-idf and dimensionality reduction was carried out on the training and the test set. The model performance in terms of the Accuracy, Precision, Recall and F1 Score was averaged across all ten iterations and the final results are as follows.
 
-![](RackMultipart20220915-1-48neab_html_3f76f82fde4680c1.png)
+<img width="225" alt="Picture1" src="https://user-images.githubusercontent.com/22619455/191872537-f8d7622b-2fe7-46c7-a4d9-5893aec81bbd.png">
 
-![Shape4](RackMultipart20220915-1-48neab_html_80d06e8079590ff0.gif) ![](RackMultipart20220915-1-48neab_html_36e397018f4033be.png)
-
-1. **Feed-Forward Neural Network**
+4. **Feed-Forward Neural Network**
 
 A feed forward artificial neural network or a Multilayer Perceptron approach can be used to solve the non-linearly separable datapoints. It consists of atleast three layers of nodes: an input layer, a hidden layer and an output layer. Our model will be created using the Keras API of the tensorflow library. The model will be made of two hidden layers with 600 nodes in the first layer and 300 nodes in the second layer, an input layer of 1000 nodes from our trainind dataset features and an output layer of 1 node giving a binary prediction of 1 or 0. The activation used in the first two hidden layers is Rectified Linear Unit and for the output layer it is Sigmoid function giving a probability of what the binary output will be. The optimization technique used for the backpropagation will be the Adam optimizer, which is precisely a complicated and adaptive version of Stochastic Graddient Descent.
 
-![Shape5](RackMultipart20220915-1-48neab_html_bdff0907eb3ca87b.gif)
+<img width="401" alt="Picture1" src="https://user-images.githubusercontent.com/22619455/191872596-7b0c8b69-23c0-4625-ad10-e31c4bf19d34.png">
 
 _Figure 9 Multilayered Perceptron Model_
 
@@ -192,11 +186,9 @@ This model was trained using the tfidf vector after dimensionality reduction. Th
 
 The training and then prediction for the test set was performed 10 times using the same total dataset. For every iteration the dataset was split randomly into Training and Test set then the tf-idf and dimensionality reduction was carried out on the training and the test set. The model performance in terms of the Accuracy, Precision, Recall and F1 Score was averaged across all ten iterations and the final results are as follows.
 
-![](RackMultipart20220915-1-48neab_html_18803a98cd9349d1.png)
+<img width="287" alt="Picture1" src="https://user-images.githubusercontent.com/22619455/191872627-5d920563-3724-4fd8-8dd5-88ddfd9e5b1b.png">
 
-![Shape6](RackMultipart20220915-1-48neab_html_933c6adb28f4240d.gif) ![](RackMultipart20220915-1-48neab_html_5573d7941334f797.png)
-
-1. **LSTM Network**
+5. **LSTM Network**
 
 For training of this model we will use the Embedding Representation of our news articles in the Section 3.2.
 
@@ -208,7 +200,7 @@ Traditional neural networks can't do this, and it seems like a major shortcoming
 
 Recurrent neural networks address this issue. They are networks with loops in them, allowing information to persist.
 
-![Picture 7](RackMultipart20220915-1-48neab_html_bf33823d52322e63.gif)
+<img width="489" alt="Picture1" src="https://user-images.githubusercontent.com/22619455/191872645-6da0f13e-24dd-4d7a-a9a4-70e09983a095.png">
 
 _Figure 10 An unrolled Recurrent Neural Network_
 
@@ -218,7 +210,7 @@ A glaring limitation of Vanilla Neural Networks (and also Convolutional Networks
 
 The core reason that recurrent nets are more felxible is that they allow us to operate over sequences of vectors: Sequences in the input, the output, or in the most general case both.
 
-![Shape7](RackMultipart20220915-1-48neab_html_e705bf6aa59a9daa.gif) ![Picture 5](RackMultipart20220915-1-48neab_html_8eeb39aa18168b2f.gif)
+![Picture1](https://user-images.githubusercontent.com/22619455/191872692-3196ce51-ccbc-4103-9282-62bf6ff58a4d.jpg)
 
 _Figure 11 Types of RNN architectures_
 
@@ -228,7 +220,7 @@ For our application, which is to predict if a news article is fake or real, the 
 
 The **LSTM** is a particular type of recurrent network that works slightly better in practice, owing to its more powerful update equation and some appealing backpropagation dynamics. An RNN composed of LSTM units is often called an  **LSTM network**.
 
-![](RackMultipart20220915-1-48neab_html_9407bf0def95d06c.png)
+<img width="419" alt="Picture1" src="https://user-images.githubusercontent.com/22619455/191872729-b1d9ac32-5ccd-4132-87f8-f6b9583003f8.png">
 
 _Figure 12 LSTM Network model summary_
 
@@ -243,13 +235,13 @@ This model was trained using the news articles consisting of sequence of integer
 
 **Result** :
 
-![Shape8](RackMultipart20220915-1-48neab_html_e8a447ab154f5be5.gif) ![](RackMultipart20220915-1-48neab_html_4c6ccb247d9606be.png)
+<img width="187" alt="Picture1" src="https://user-images.githubusercontent.com/22619455/191872744-a0830c56-f842-4bdc-be86-25547013175e.png">
 
 1. **Conclusion**
 
 The aim of this project was to test different data representation methods and train various models using this data. We collected our real news articles from sources like The Gaurdian and the fake news dataset was aquired from Kaggle. Then two type of data representation techniques were used namely, TF-IDF Vectorization and Word Embeddings. The resulting transformed data was trained on the models mentioned in Section 4, and the following results were extrapolated from this experiment.
 
-![](RackMultipart20220915-1-48neab_html_6385b92dab952627.png)
+<img width="476" alt="Picture1" src="https://user-images.githubusercontent.com/22619455/191872770-a1cca312-6681-41a8-a4a2-e178a6e38919.png">
 
 The ratio of real news to fake news in the dataset were biased to resemble the real world scenario. Hence, in situation like these the model **accuracy** is really not the best metric to base our results. We generally test the performace of a model trained a biased dataset using **F1-Score** , which is nothing but the harmonic mean of **precision** and **recall**. The above scores are given for prediction of the fake news article.
 
